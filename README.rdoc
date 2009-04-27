@@ -47,18 +47,64 @@ We will provide a gem based installation in the next release.
 In your application layout (typically somewhere below <%= javascript_include_tag(:defaults) %>)
 
   ...
-  <%= bespin_include_tag %>
+  <head>
+    ...
+    <%= bespin_include_tag %>
+  </head>
   ...
 
-In your views (example form)
+In your views (examples)
 
   <% form_tag ... do %>
     ...
-    <%= bespin_editor_tag :content, '<div>some html snippet</div>', :editor_style => 'height: 600px', :language => 'html' %>
+    <%= bespin_editor_tag 'snippet', '<div>some html snippet</div>' %>
+    ...
+  <% end %>
+
+  <% form_for @code_snippet do |f| %>
+    ...
+    <%= bespin_editor_tag 'code_snippet[snippet]', '<div>some html snippet</div>' %>
+    ...
   <% end %>
 
 == Configuration
 
-TODO
+You may pass an optional hash of options as a third parameter to +bespin_editor_tag+ as follows:
+
+* <tt>:editor_style</tt> - CSS style attributes as a string for styling the editor. The editor
+  is just a <div>.
+
+Example:
+
+  <% form_for @code_snippet do |f| %>
+    ...
+    <%= bespin_editor_tag 'code_snippet[snippet]', '<div>some html snippet</div>', :editor_style => 'height: 600px' %>
+    ...
+  <% end %>
+
+This will set the height of the editor to 600px.
+
+* <tt>:language</tt> - A string telling Bespin which syntax highlighter to use. This default to 'html'.
+
+Example:
+
+  <% form_for @code_snippet do |f| %>
+    ...
+    <%= bespin_editor_tag 'code_snippet[snippet]', '<div>some html snippet</div>', :language => 'javascript' %>
+    ...
+  <% end %>
+
+This will set the syntax highlighter for JavaScript. Available highlighters are 'arduino', 'css', 'html', 
+'javascript', 'php'.
+
+* <tt>:settings</tt> - A hash of Bespin settings.
+
+Example:
+
+  <% form_for @code_snippet do |f| %>
+    ...
+    <%= bespin_editor_tag 'code_snippet[snippet]', '<div>some html snippet</div>', :settings => {strictlines => 'on'} %>
+    ...
+  <% end %>
 
 Copyright (c) 2009 Provideal Systems GmbH, released under the MIT license
