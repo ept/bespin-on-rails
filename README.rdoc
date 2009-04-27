@@ -1,32 +1,47 @@
 = BespinRails
 
 Bespin-on-Rails is a simple Rails plugin that allows you to embed the Mozilla
-Bespin[http://labs.mozilla.com/projects/bespin/] code editor component in your
-Rails views using two simple helper tags.
+Bespin code editor component in your Rails views using simple helper tags.
 
-Please note: This is the first release and it is not well tested.
+Bespin is a Mozilla Labs experiment on how to build an extensible Web code
+editor using HTML 5 technology.
+
+Bespin Project home page: http://labs.mozilla.com/projects/bespin/
+Bespin Live system: https://bespin.mozilla.com/
+
+This plugin comes bundled with Bespin (Head version 2009/04/27). To learn more
+about Bespin have a look at their Labs site at http://labs.mozilla.com/projects/bespin/. 
+Please report any issue with the editor on their issue tracker.
+
+There is also an unofficial Bespin mirror on GitHub at http://github.com/bespin/bespin.
+
+To report issues related to the plugin please use the issue tracker on
+GitHub at http://github.com/provideal/bespin-on-rails/issues.
 
 == Requirements
 
 You need at least Rails 2.3 for this plugin. To make the bundled resources
 available in your applications public folder the plugin will create a symlink
-from your applications public folder to the plugins +public/+ folder. This is
-currently done using the +ln -s+ unix command. As a result the plugin won't
+from your applications public folder to the plugins public folder. This is
+currently done using the 'ln' unix command. As a result the plugin won't
 work on Windows.
 
-To work around this you may manually copy all files from +vendor/plugins/bespin_rails/public+
-to +public/_plugins/bespin_rails+.
+To work around this you can manually copy all files from vendor/plugins/bespin_rails/public
+to public/_plugins/bespin_rails.
+
+You need a browser that is able to work with Mozilla Bespin. Safari 4 (beta) and 
+Mozilla Firefox 3.0.9 are fine.
 
 == Installation
 
-Download the plugin from https://github.com/provideal/bespin-rails and install
-it in your application in +vendor/plugins/bespin_rails+.
+Download the plugin from http://github.com/provideal/bespin-on-rails/ and install
+it in vendor/plugins/bespin-on-rails.
 
 We will provide a gem based installation in the next release.
 
 == Usage
 
-In your application layout (somewhere below the <%= javascript_include_tag(:defaults) %>)
+In your application layout (typically somewhere below <%= javascript_include_tag(:defaults) %>)
 
   ...
   <%= bespin_include_tag %>
