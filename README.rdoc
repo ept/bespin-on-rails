@@ -37,7 +37,7 @@ Mozilla Firefox 3.0.9 are fine.
 
 == Installation
 
-Download the plugin from http://github.com/provideal/bespin-on-rails/ and install
+Download the plugin from http://github.com/provideal/bespin-on-rails and install
 it in vendor/plugins/bespin-on-rails.
 
 We will provide a gem based installation in the next release.
