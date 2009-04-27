@@ -84,7 +84,7 @@ Example:
 
 This will set the height of the editor to 600px.
 
-* <tt>:language</tt> - A string telling Bespin which syntax highlighter to use. This default to 'html'.
+* <tt>:language</tt> - A string telling Bespin which syntax highlighter to use. This defaults to 'html'.
 
 Example:
 
