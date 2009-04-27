@@ -1,0 +1,46 @@
+= BespinRails
+
+Bespin-on-Rails is a simple Rails plugin that allows you to embed the Mozilla
+Bespin[http://labs.mozilla.com/projects/bespin/] code editor component in your
+Rails views using two simple helper tags.
+
+Please note: This is the first release and it is not well tested.
+
+== Requirements
+
+You need at least Rails 2.3 for this plugin. To make the bundled resources
+available in your applications public folder the plugin will create a symlink
+from your applications public folder to the plugins +public/+ folder. This is
+currently done using the +ln -s+ unix command. As a result the plugin won't
+work on Windows.
+
+To work around this you may manually copy all files from +vendor/plugins/bespin_rails/public+
+to +public/_plugins/bespin_rails+.
+
+== Installation
+
+Download the plugin from https://github.com/provideal/bespin-rails and install
+it in your application in +vendor/plugins/bespin_rails+.
+
+We will provide a gem based installation in the next release.
+
+== Usage
+
+In your application layout (somewhere below the <%= javascript_include_tag(:defaults) %>)
+
+  ...
+  <%= bespin_include_tag %>
+  ...
+
+In your views (example form)
+
+  <% form_tag ... do %>
+    ...
+    <%= bespin_editor_tag :content, '<div>some html snippet</div>', :editor_style => 'height: 600px', :language => 'html' %>
+  <% end %>
+
+== Configuration
+
+TODO
+
+Copyright (c) 2009 Provideal Systems GmbH, released under the MIT license

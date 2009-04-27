@@ -1,0 +1,20 @@
+<textarea id="<%= name -%>" name="<%= name -%>" style="display: none"><%= content %></textarea>
+
+<div id="<%= name -%>_editor" style="<%= editor_style -%>"></div>
+
+<script>
+  dojo.addOnLoad(function() {
+    _editorComponent = new bespin.editor.Component("<%= name -%>_editor", {
+      language: "<%= language || 'html' -%>",
+      set: {
+        strictlines: 'on'
+      }
+    });
+
+    _editorComponent.setContent(dojo.byId("<%= name -%>").value);
+
+    _editorComponent.onchange(function() {
+      dojo.byId("<%= name -%>").value = _editorComponent.getContent();
+    });
+  });
+</script>

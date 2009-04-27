@@ -1,0 +1,64 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <title>The Bespin Editor Component</title>
+
+  <style type="text/css">*:focus { outline: 0; }</style>
+
+  <script>
+    var djConfig = { parseOnLoad: false, isDebug: false, debugAtAllCosts: false };
+  </script>
+
+  <script src="dojo/dojo.js"></script>
+  <script src="bespin/editor/embed.js"></script>
+
+  <script>
+    var _editorComponent;
+
+    // Loads and configures the objects that the editor needs
+    // You can use dojo.addOnLoad(...); but for that you will need to load up dojo.js first
+    window.onload = function() {
+      _editorComponent = new bespin.editor.Component('editor', {
+        language: "html",
+        loadfromdiv: true,
+        set: {
+          strictlines: 'off'
+        }
+      });
+    };
+
+    function copyToTextarea() {
+      dojo.byId('inandout').value = _editorComponent.getContent();
+    }
+
+    function copyToEditor() {
+      _editorComponent.setContent(dojo.byId('inandout').value);
+    }
+
+    function setSyntax(value) {
+      bespin.publish("settings:language", { language: value });
+    }
+  </script>
+</head>
+<body>
+  <h3>Sample Editor as a Component</h3>
+
+  <div id="editor" style="height: 600px;"></div>
+<!--
+  <div style="padding: 20px">
+    <b style="display: block; border-bottom: 1px solid #ddd;">Play with the editor</b><br/>
+    Enter language and blur out: <input type="text" id="syntax" value="" onblur="setSyntax(this.value)"/><br/>
+    Push a new setting:
+    <input type="text" id="key" value="strictlines"/>
+    <input type="text" id="value" value="on"/>
+    <input type="button" value="set" onclick="_editorComponent.set(dojo.byId('key').value, dojo.byId('value').value)"/>
+    <br/>
+
+    <textarea id="inandout" cols="100" rows="10"></textarea><br/>
+    <input type="button" value="Copy to Textarea" onclick="copyToTextarea()"/>
+    <input type="button" value="Copy to Editor" onclick="copyToEditor()"/>
+  </div>
+-->
+</body>
+</html>
