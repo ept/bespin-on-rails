@@ -1,8 +1,7 @@
 <%= text_area_tag name, content, :style => 'display:none'%>
 
 <div id="<%= name -%>_editor" style="<%= editor_style -%>"></div>
-
-<script>
+<script type="text/javascript">
   dojo.addOnLoad(function() {
     _editorComponent = new bespin.editor.Component("<%= name -%>_editor", {
       language: "<%= language -%>"
