@@ -9,9 +9,11 @@ editor using HTML 5 technology.
 Bespin Project home page: http://labs.mozilla.com/projects/bespin
 Bespin Live system: https://bespin.mozilla.com
 
-This plugin comes bundled with Bespin (head version 2009/04/27). To learn more
+This plugin comes bundled with Bespin (source code version 2009/04/23). To learn more
 about Bespin have a look at their Labs site at http://labs.mozilla.com/projects/bespin. 
 Please report any issue with the editor on their issue tracker.
+
+We will upgrade the plugin to Bespin 0.2 as soon as possible.
 
 There is also an unofficial Bespin mirror on GitHub at http://github.com/bespin/bespin.
 
