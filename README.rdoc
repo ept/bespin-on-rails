@@ -107,4 +107,6 @@ Example:
     ...
   <% end %>
 
+Please note: Setting a theme (e.g :theme => 'white') is currently broken.
+
 Copyright (c) 2009 Provideal Systems GmbH, released under the MIT license
