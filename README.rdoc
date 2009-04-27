@@ -29,8 +29,8 @@ from your applications public folder to the plugins public folder. This is
 currently done using the 'ln' unix command. As a result the plugin won't
 work on Windows.
 
-To work around this you can manually copy all files from vendor/plugins/bespin_rails/public
-to public/_plugins/bespin_rails.
+To work around this you can manually copy all files from vendor/plugins/bespin-on-rails/public
+to public/_plugins/bespin-on-rails.
 
 You need a browser that is able to work with Mozilla Bespin. Safari 4 (beta) and 
 Mozilla Firefox 3.0.9 are fine.
