@@ -1,15 +1,16 @@
-<textarea id="<%= name -%>" name="<%= name -%>" style="display: none"><%= content %></textarea>
+<%= text_area_tag name, content, :style => 'display:none'%>
 
 <div id="<%= name -%>_editor" style="<%= editor_style -%>"></div>
 
 <script>
   dojo.addOnLoad(function() {
     _editorComponent = new bespin.editor.Component("<%= name -%>_editor", {
-      language: "<%= language || 'html' -%>",
-      set: {
-        strictlines: 'on'
-      }
+      language: "<%= language -%>"
     });
+
+    <% settings.each do |k, v| %>
+    _editorComponent.set("<%= k -%>", "<%= v -%>");
+    <% end %>
 
     _editorComponent.setContent(dojo.byId("<%= name -%>").value);
 

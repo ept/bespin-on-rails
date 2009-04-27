@@ -2,7 +2,7 @@ module BespinOnRails
   class << self
     def enable
       require 'bespin_on_rails/view_helpers'
-      ::ActionView::Base.send :include, BespinOnRails::ViewHelpers
+      ::ActionView::Base.send :include, BespinOnRails::Helpers::FormTagHelper
     end
   end
 end
