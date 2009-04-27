@@ -1,6 +1,6 @@
-= BespinRails
+= Bespin on Rails
 
-Bespin-on-Rails is a simple Rails plugin that allows you to embed the Mozilla
+Bespin on Rails is a simple Ruby on Rails plugin that allows you to embed the Mozilla
 Bespin code editor component in your Rails views using simple helper tags.
 
 Bespin is a Mozilla Labs experiment on how to build an extensible Web code
