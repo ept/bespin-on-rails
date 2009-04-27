@@ -6,17 +6,20 @@ Bespin code editor component in your Rails views using simple helper tags.
 Bespin is a Mozilla Labs experiment on how to build an extensible Web code
 editor using HTML 5 technology.
 
-Bespin Project home page: http://labs.mozilla.com/projects/bespin/
-Bespin Live system: https://bespin.mozilla.com/
+Bespin Project home page: http://labs.mozilla.com/projects/bespin
+Bespin Live system: https://bespin.mozilla.com
 
 This plugin comes bundled with Bespin (Head version 2009/04/27). To learn more
-about Bespin have a look at their Labs site at http://labs.mozilla.com/projects/bespin/. 
+about Bespin have a look at their Labs site at http://labs.mozilla.com/projects/bespin. 
 Please report any issue with the editor on their issue tracker.
 
 There is also an unofficial Bespin mirror on GitHub at http://github.com/bespin/bespin.
 
 To report issues related to the plugin please use the issue tracker on
 GitHub at http://github.com/provideal/bespin-on-rails/issues.
+
+If you have any comments on the plugin please contact me (René) by email 
+(info AT provideal DOT net) or on Twitter (@renspr).
 
 == Requirements
 
