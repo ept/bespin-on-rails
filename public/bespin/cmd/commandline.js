@@ -217,12 +217,13 @@ dojo.declare("bespin.cmd.commandline.Interface", null, {
     showInfo: function(html, autohide) {
         if (this.suppressInfo) return; // bypass
 
-        this.hideInfo();
-
-        dojo.byId('info').innerHTML = html;
+        this.hideInfo();                
+        dojo.byId('info_text').innerHTML = html;
         dojo.style('info', 'display', 'block'); 
+        
+        this.infoResizer();
         dojo.connect(dojo.byId('info'), "onclick", this, "hideInfo");
-
+        
         if (autohide) {
             this.infoTimeout = setTimeout(dojo.hitch(this, function() {
                 this.hideInfo();
@@ -233,6 +234,18 @@ dojo.declare("bespin.cmd.commandline.Interface", null, {
     hideInfo: function() {
         dojo.style('info', 'display', 'none');
         if (this.infoTimeout) clearTimeout(this.infoTimeout);
+    },
+    
+    infoResizer: function() {
+    	if(dojo.style('info','display')!='none') {
+    		dojo.style('info','height','');
+    		var browserY=window.innerHeight-dojo.style('commandline','height');
+    		var infoY=dojo.style('info','height');
+    		if((infoY/browserY)*100>35) {
+    			var nHeight=(browserY*.35)+'px';
+    			dojo.style('info','height',nHeight);  
+    		}    		
+    	}
     },
 
     complete: function(value) {
@@ -348,6 +361,8 @@ dojo.declare("bespin.cmd.commandline.KeyBindings", null, {
         });             
         
         dojo.connect(cl.commandLine, "onkeypress", cl, function(e) {
+            var Key = bespin.util.keys.Key;
+
             if (e.keyChar == 'j' && e.ctrlKey) { // send back
                 dojo.stopEvent(e);
 
@@ -356,17 +371,29 @@ dojo.declare("bespin.cmd.commandline.KeyBindings", null, {
                 bespin.publish("cmdline:blur");
 
                 return false;
-            } else if ((e.keyChar == 'n' && e.ctrlKey) || e.keyCode == dojo.keys.DOWN_ARROW) {
+            } else if ((e.keyChar == 'n' && e.ctrlKey) || e.keyCode == Key.DOWN_ARROW) {
+                dojo.stopEvent(e);
+
                 this.commandLineHistory.setNext();
+
                 return false;
-            } else if ((e.keyChar == 'p' && e.ctrlKey) || e.keyCode == dojo.keys.UP_ARROW) {
+            } else if ((e.keyChar == 'p' && e.ctrlKey) || e.keyCode == Key.UP_ARROW) {
+                dojo.stopEvent(e);
+
                 this.commandLineHistory.setPrevious();
+
                 return false;
-            } else if (e.keyCode == dojo.keys.ENTER) {
+            } else if (e.keyChar == 'u' && e.ctrlKey) {
+                dojo.stopEvent(e);
+
+                cl.commandLine.value = '';
+
+                return false;
+            } else if (e.keyCode == Key.ENTER) {
                 this.executeCommand(dojo.byId('command').value);
 
                 return false;
-            } else if (e.keyCode == dojo.keys.TAB) { 
+            } else if (e.keyCode == Key.TAB) { 
                 dojo.stopEvent(e);
                 
                 this.complete(dojo.byId('command').value);
@@ -375,7 +402,7 @@ dojo.declare("bespin.cmd.commandline.KeyBindings", null, {
         });
 
         dojo.connect(cl.commandLine, "onkeydown", cl, function(e) {
-            if (e.keyCode == dojo.keys.ESCAPE) {
+            if (e.keyCode == bespin.util.keys.Key.ESCAPE) {
                 this.hideInfo();
             }
         });
@@ -441,8 +468,10 @@ dojo.declare("bespin.cmd.commandline.History", null, {
         return this.history[0];
     },
 
-    set: function(command) {
-        this.commandLine.commandLine.value = command;
+    set: function(commandString) {
+        var cmdline = this.commandLine.commandLine;
+
+        cmdline.value = commandString;
     },
 
     setNext: function() {
