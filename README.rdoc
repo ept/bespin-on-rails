@@ -84,7 +84,7 @@ Example:
 
   <% form_for @code_snippet do |f| %>
     ...
-    <%= bespin_editor_tag 'code_snippet[snippet]', '<div>some html snippet</div>', :language => 'javascript' %>
+    <%= bespin_editor_tag 'code_snippet[snippet]', 'var foo = 42;', :language => 'js' %>
     ...
   <% end %>
 
