@@ -43,17 +43,9 @@ dojo.require("bespin.client.session");
 
 dojo.require("bespin.cmd.commandline");
 dojo.require("bespin.cmd.commands");
-dojo.require("bespin.vcs");
+dojo.require("bespin.vcs");      // load up VCS module and its commands
+dojo.require("bespin.jetpack");  // load up Jetpack module and its commands
 dojo.require("bespin.cmd.dashboardcommands");
-//dojo.require("bespin.social");
-
-// -- Thunderhead hoooooo
-dojo.require("th.helpers");
-dojo.require("th.css");
-dojo.require("th.th");
-dojo.require("th.models");
-dojo.require("th.borders");
-dojo.require("th.components");
 
 // -- The main dashboard subsystems
 dojo.require("bespin.page.dashboard.components");

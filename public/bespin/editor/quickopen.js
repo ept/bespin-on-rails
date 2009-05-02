@@ -168,16 +168,16 @@ dojo.declare("bespin.editor.quickopen.API", null, {
             } 
         }));
                 
-        // handle ARROW_UP and ARROW_DOWN to select items in the list and other stuff
+        // handle UP_ARROW and DOWN_ARROW to select items in the list and other stuff
         dojo.connect(window, "keydown", dojo.hitch(this, function(e) {
             if (!this.window.isVisible) return; // short circuit if the popup isn't up
             
             var key = bespin.util.keys.Key;
             
-            if (e.keyCode == key.ARROW_UP) {                
+            if (e.keyCode == key.UP_ARROW) {                
                 this.panel.list.moveSelectionUp();
                 dojo.stopEvent(e);
-            } else if (e.keyCode == key.ARROW_DOWN) {
+            } else if (e.keyCode == key.DOWN_ARROW) {
                 this.panel.list.moveSelectionDown();
                 dojo.stopEvent(e);
             } else if (e.keyCode == key.ENTER) {
@@ -214,19 +214,21 @@ dojo.declare("bespin.editor.quickopen.API", null, {
         var items = new Array();
         var sortedItems = new Array();
         var quickopen = bespin.get('quickopen');
+        var settings = bespin.get('settings');
         var lastFolder;
         var name;
         var path;
         var lastSlash;
         var file;
         
-        // for the moment there are only 12 files displayed...
-        files = files.slice(0, 12);        
         for (var x = 0; x < files.length; x++) {                
             file = files[x];
             lastSlash = file.lastIndexOf("/");
             path = (lastSlash == -1) ? "" : file.substring(0, lastSlash);
             name = (lastSlash == -1) ? file : file.substring(lastSlash + 1);
+            if (settings && settings.isSettingOff('dotmode') && name[0] == '.') {
+                continue;
+            }
 
             // look at the array if there is an entry with the same name => adds folder to it!
             lastFolder = false;
@@ -244,6 +246,9 @@ dojo.declare("bespin.editor.quickopen.API", null, {
             }
             items.push({name: name, filename: file, lastFolder: lastFolder});
         }
+
+        // for the moment there are only 12 files displayed...
+        items = items.slice(0, 12);
         
         if (sortFiles) {
             items.sort(function(a, b) {

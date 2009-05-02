@@ -672,8 +672,22 @@ dojo.declare("bespin.editor.Actions", null, {
         this.cursorManager.moveCursor({ row: saveCursorRow });
     },
 
+    getOppositeCase: function(stringCase) {
+        if (!stringCase) return undefined;
+
+        switch (stringCase) {
+            case 'u':
+                return 'l';
+            break;
+
+            case 'l':
+                return 'u';
+            break;
+        }
+    },
+
     selectionChangeCase: function(args) {
-		console.log('selectionChangeCase Fired!');
+        console.log('selectionChangeCase Fired!');
         if (this.editor.selection) {
             if (!args.selectionObject) {
                 args.selectionObject = this.editor.getSelection();
@@ -682,14 +696,17 @@ dojo.declare("bespin.editor.Actions", null, {
             var selection = this.model.getChunk(args.selectionObject);
             var stringArray = selection.split("\n");
             for (i in stringArray) {
-                if (args.stringCase ==="l") {
-                    stringArray[i] = stringArray[i].toLowerCase();
-                }
-                else {
-                    stringArray[i] = stringArray[i].toUpperCase();
+                switch (args.stringCase) {
+                    case 'l':
+                        stringArray[i] = stringArray[i].toLowerCase();
+                    break;
+
+                    case 'u':
+                        stringArray[i] = stringArray[i].toUpperCase();
+                    break;
                 }
             }
-            var outText = stringArray.join("\n");            
+            var outText = stringArray.join("\n");
 
             this.model.deleteChunk(args.selectionObject);
             this.model.insertChunk(args.selectionObject.startModelPos, outText);
@@ -697,19 +714,98 @@ dojo.declare("bespin.editor.Actions", null, {
 
             args.action = "selectionChangeCase";
             var redoOperation = args;
-            var undoArgs = { action: "undoSelectionChangeCase", selectionObject: args.selectionObject, text: selection, stringCase: args.stringCase };
+            var undoArgs = { action: "undoSelectionChangeCase", selectionObject: args.selectionObject, text: selection, stringCase: this.getOppositeCase(args.stringCase) };
             var undoOperation = undoArgs;
             this.editor.undoManager.addUndoOperation(new bespin.editor.UndoItem(undoOperation, redoOperation));
         }
     },
 
-    // START SEARCH ACTIONS
-    // find the next match in the file
-    findNext: function() {
-        if (!this.editor.ui.searchString) return;
-        var pos = this.cursorManager.getModelPosition();
-        var found = this.model.findNext(pos.row, pos.col, this.editor.ui.searchString);
+    undoSelectionChangeCase: function(args) {
+        this.model.deleteChunk(args.selectionObject);
+        var selection = this.model.insertChunk(args.selectionObject.startModelPos, args.text);
+        this.select(args.selectionObject);
 
+/*        args.action = "undoSelectionChangeCase";
+        var redoOperation = args;
+        var undoArgs = { action: "selectionChangeCase", selectionObject: args.selectionObject, text: selection, stringCase: this.getOppositeCase(args.stringCase) };
+        var undoOperation = undoArgs;
+        this.editor.undoManager.addUndoOperation(new bespin.editor.UndoItem(undoOperation, redoOperation));*/
+    },
+
+    // START SEARCH ACTIONS
+    startSearch: function(str, displayType, shiftKey) {
+        if (str == '') {
+            // nothing to search for? Reset the searchString
+            this.editor.ui.setSearchString(false);
+            this.editor.paint(true);
+            dojo.byId('searchresult').style.display = 'none';    
+            return false;
+        }
+        
+        if (str == this.editor.ui.searchString && displayType == 'toolbar') {
+            if (!shiftKey) {
+                this.findNext();    
+            } else {
+                this.findPrev();    
+            }
+            dojo.byId('searchresult').style.display = 'block';
+            return;
+        }
+        
+        // go and search for the searchString
+        this.editor.ui.setSearchString(str);
+        var count = this.editor.model.getCountOfString(str);
+        if (count != 0) {
+            // okay, there are matches, so go on...
+            var pos = bespin.editor.utils.copyPos(this.editor.cursorManager.getCursorPosition());
+
+            // first try to find the searchSting from the current position
+            if (!this.editor.ui.actions.findNext(true)) {
+                // there was nothing found? Search from the beginning
+                this.editor.cursorManager.moveCursor({col: 0, row: 0 });
+                this.editor.ui.actions.findNext();
+            }
+        }
+        
+        // display the count of matches in different ways
+        switch(displayType) {
+            case 'commandLine':
+                var msg = "Found " + count + " match";
+                if (count > 1) { msg += 'es'; }
+                msg += " for your search for <em>" + str + "</em>";
+
+                bespin.get('commandLine').showInfo(msg, true);
+            break;
+            
+            case 'searchwindow':
+                var filesearch = bespin.get('filesearch');
+                if (filesearch) {
+                    filesearch.setMatchesCount(count);
+                }
+            break;
+            
+            case 'toolbar':
+                var msg = + count + " Match";
+                if (count > 1) { msg += 'es'; }
+                dojo.byId('searchfeedback').innerHTML = msg;
+                dojo.byId('searchresult').style.display = 'block';
+            break;
+        }
+        
+        // repaint the editor
+        this.editor.paint(true);
+    },
+    
+    // find the next match in the file
+    findNext: function(canBeSamePosition) {
+        if (!this.editor.ui.searchString) return;
+        var pos = bespin.editor.utils.copyPos(this.cursorManager.getModelPosition());
+        var sel = this.editor.getSelection();
+        if (canBeSamePosition && sel !== undefined) {
+            pos.col -= sel.endModelPos.col - sel.startModelPos.col + 1;
+        }
+        var found = this.model.findNext(pos.row, pos.col, this.editor.ui.searchString);
+        if (!found) found = this.model.findNext(0, 0, this.editor.ui.searchString);
         if (found) {
             this.editor.setSelection({startPos: this.cursorManager.getCursorPosition(found.startPos), endPos: this.cursorManager.getCursorPosition(found.endPos)});
             this.cursorManager.moveCursor(this.cursorManager.getCursorPosition(found.endPos));
@@ -728,6 +824,10 @@ dojo.declare("bespin.editor.Actions", null, {
 
         var pos = this.cursorManager.getModelPosition();
         var found = this.model.findPrev(pos.row, pos.col, this.editor.ui.searchString);
+        if (!found) {
+            var lastRow = this.model.getRowCount() - 1;
+            found = this.model.findPrev(lastRow, this.model.getRowArray(lastRow).length - 1, this.editor.ui.searchString);  
+        } 
         if (found) {
             this.editor.setSelection({startPos: this.cursorManager.getCursorPosition(found.startPos), endPos: this.cursorManager.getCursorPosition(found.endPos)});
             this.cursorManager.moveCursor(this.cursorManager.getCursorPosition(found.endPos));
@@ -740,18 +840,27 @@ dojo.declare("bespin.editor.Actions", null, {
     escape: function() {
         bespin.publish("ui:escape");
     },
-
-    // focus the search field
-    findSelectInputField: function() {
-        dojo.byId('searchquery').focus();
-    },
     // END SEARCH ACTIONS
-    
+
     toggleQuickopen: function() {
         var quickopen = bespin.get('quickopen');
         if (quickopen) {
             quickopen.window.toggle();
-        }  
+        }
+    },
+    
+    toggleFilesearch: function() {
+        var settings = bespin.get("settings");
+        
+        if (settings && !settings.isSettingOn('searchwindow')) {
+            dojo.byId('searchquery').focus();
+            dojo.byId('searchquery').select();
+        } else {
+            var filesearch = bespin.get('filesearch');
+            if (filesearch) {
+                filesearch.window.toggle();
+            }            
+        }
     },
     
     focusCommandline: function() {
@@ -759,18 +868,6 @@ dojo.declare("bespin.editor.Actions", null, {
         if (commandLine) {
             commandLine.commandLine.focus();
         }
-    },
-        
-    undoSelectionChangeCase: function(args) {
-        this.model.deleteChunk(args.selectionObject);
-        this.model.insertChunk(args.selectionObject.startModelPos, args.text);
-        this.select(args.selectionObject);
-
-        /*args.action = "undoSelectionChangeCase";
-        var redoOperation = args;
-        var undoArgs = { action: "selectionChangeCase", selectionObject: args.selectionObject, stringCase: args.stringCase};
-        var undoOperation = undoArgs;
-        this.editor.undoManager.addUndoOperation(new bespin.editor.UndoItem(undoOperation, redoOperation));*/
     },
 
     repaint: function() {

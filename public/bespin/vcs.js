@@ -28,9 +28,14 @@ dojo.require("bespin.util.webpieces");
 dojo.require("bespin.cmd.commands");
 dojo.require("bespin.cmd.commandline");
 
-// Command store for the VCS commands (which are subcommands of the main
-// 'vcs' command)
-bespin.vcs.commands = new bespin.cmd.commandline.CommandStore();
+// Command store for the VCS commands
+// (which are subcommands of the main 'vcs' command)
+bespin.vcs.commands = new bespin.cmd.commandline.CommandStore({ subCommand: {
+    name: 'vcs',
+    preview: 'run a version control command',
+    completeText: 'subcommands: add, clone, commit, diff, getkey, help, push, remove, resolved, update',
+    subcommanddefault: 'help'
+}});
 
 bespin.vcs.standardHandler = {
     evalJSON: true,
@@ -63,7 +68,7 @@ bespin.subscribe("vcs:remoteauthUpdate", function(event) {
 
 bespin.vcs.clone = function(url) {
     var el = dojo.byId('centerpopup');
-    
+
     el.innerHTML = '<form method="POST" id="vcsauth">'
             + '<table><tbody><tr><td>Keychain password</td><td>'
             + '<input type="password" name="kcpass" id="kcpass"></td></tr>'
@@ -92,7 +97,7 @@ bespin.vcs.clone = function(url) {
             + '<input type="button" id="vcsauthsubmit" value="Clone">'
             + '<input type="button" id="vcsauthcancel" value="Cancel">'
             + '</td></tr></tbody></table></form>';
-    
+
     dojo.connect(dojo.byId("remoteauth"), "onchange", function() {
         var newval = dojo.byId("remoteauth").value;
         if (newval == "") {
@@ -104,7 +109,7 @@ bespin.vcs.clone = function(url) {
             }
         }
     });
-    
+
     dojo.connect(dojo.byId("authtype"), "onchange", function() {
         var newval = dojo.byId("authtype").value;
         if (newval == "ssh") {
@@ -113,11 +118,11 @@ bespin.vcs.clone = function(url) {
             dojo.query("tr.userfields").style("display", "table-row");
         }
     });
-    
+
     dojo.connect(dojo.byId("vcsauthcancel"), "onclick", function() {
         bespin.util.webpieces.hideCenterPopup(el);
     });
-    
+
     dojo.connect(dojo.byId("vcsauthsubmit"), "onclick", function() {
         bespin.util.webpieces.hideCenterPopup(el);
         var data = dojo.formToObject("vcsauth");
@@ -142,14 +147,14 @@ bespin.vcs.clone = function(url) {
             }
         });
     });
-    
+
     bespin.util.webpieces.showCenterPopup(el, true);
     dojo.byId("kcpass").focus();
 };
 
 bespin.vcs.setProjectPassword = function(project) {
     var el = dojo.byId('centerpopup');
-    
+
     el.innerHTML = '<form method="POST" id="vcsauth">'
             + '<table><tbody><tr><td>Keychain password</td><td>'
             + '<input type="password" name="kcpass"></td></tr>'
@@ -161,14 +166,14 @@ bespin.vcs.setProjectPassword = function(project) {
             + '<input type="button" id="vcsauthsubmit" value="Save">'
             + '<input type="button" id="vcsauthcancel" value="Cancel">'
             + '</td></tr></tbody></table></form>';
-    
+
     dojo.connect(dojo.byId("vcsauthcancel"), "onclick", function() {
         bespin.util.webpieces.hideCenterPopup(el);
     });
-    
+
     dojo.connect(dojo.byId("vcsauthsubmit"), "onclick", function() {
         bespin.util.webpieces.hideCenterPopup(el);
-        bespin.get("server").setauth(project, "vcsauth", 
+        bespin.get("server").setauth(project, "vcsauth",
             {
                 onSuccess: function() {
                     bespin.publish("message", {msg: "Password saved for " + project});
@@ -178,7 +183,7 @@ bespin.vcs.setProjectPassword = function(project) {
                 }
             });
     });
-    
+
     bespin.util.webpieces.showCenterPopup(el, true);
 };
 
@@ -189,7 +194,7 @@ bespin.vcs.setProjectPassword = function(project) {
 // is not called.
 bespin.vcs.getKeychainPassword = function(callback) {
     var el = dojo.byId('centerpopup');
-    
+
     el.innerHTML = '<form id="vcsauth">'
             + '<table><tbody><tr><td>Keychain password</td><td>'
             + '<input type="password" id="kcpass">'
@@ -197,11 +202,11 @@ bespin.vcs.getKeychainPassword = function(callback) {
             + '<input type="button" id="vcsauthsubmit" value="Submit">'
             + '<input type="button" id="vcsauthcancel" value="Cancel">'
             + '</td></tr></tbody></table></form>';
-    
+
     dojo.connect(dojo.byId("vcsauthcancel"), "onclick", function() {
         bespin.util.webpieces.hideCenterPopup(el);
     });
-    
+
     function saveform() {
         bespin.util.webpieces.hideCenterPopup(el);
         var kcpass = dojo.byId("kcpass").value;
@@ -209,10 +214,10 @@ bespin.vcs.getKeychainPassword = function(callback) {
         callback(kcpass);
         return false;
     };
-    
+
     dojo.connect(dojo.byId("vcsauthsubmit"), "onclick", saveform);
     dojo.connect(dojo.byId("vcsauth"), "onsubmit", saveform);
-    
+
     bespin.util.webpieces.showCenterPopup(el, true);
     dojo.byId("kcpass").focus();
 };
@@ -250,14 +255,14 @@ bespin.vcs.commands.addCommand({
             self.showInfo("You need to pass in a project");
             return;
         }
-        
+
         bespin.vcs.getKeychainPassword(function(kcpass) {
-            bespin.get('server').vcs(project, 
+            bespin.get('server').vcs(project,
                                     {command: ['push', '_BESPIN_PUSH'],
-                                    kcpass: kcpass}, 
+                                    kcpass: kcpass},
                                     bespin.vcs.standardHandler);
         });
-    }                                
+    }
 });
 
 // ** {{{Command: diff}}} **
@@ -286,6 +291,29 @@ bespin.vcs.commands.addCommand({
     }
 });
 
+// ** {{{Command: status}}} **
+bespin.vcs.commands.addCommand({
+    name: 'status',
+    preview: 'Display the status of the repository files.',
+    description: 'Shows the current state of the files in the repository<br>M for modified, ? for unknown (you may need to add), R for removed, ! for files that are deleted but not removed',
+    // ** {{{execute}}} **
+    execute: function(self, args) {
+        var project;
+
+        bespin.withComponent('editSession', function(editSession) {
+            project = editSession.project;
+        });
+
+        if (!project) {
+            self.showInfo("You need to pass in a project");
+            return;
+        }
+
+        bespin.get('server').vcs(project,
+                                {command: ['status']},
+                                bespin.vcs.standardHandler);
+    }
+});
 
 // ** {{{Command: diff}}} **
 bespin.vcs.commands.addCommand({
@@ -297,7 +325,7 @@ bespin.vcs.commands.addCommand({
     // ** {{{execute}}} **
     execute: function(self, args) {
         bespin.vcs._performVCSCommandWithFiles("resolved", self, args);
-    }                                
+    }
 });
 
 
@@ -317,21 +345,21 @@ bespin.vcs.commands.addCommand({
             self.showInfo("You need to pass in a project");
             return;
         }
-        
+
         var sendRequest = function(kcpass) {
             var command = {
                 command: ['update', '_BESPIN_REMOTE_URL']
             };
-            
+
             if (kcpass !== undefined) {
                 command.kcpass = kcpass;
             }
-            
-            bespin.get('server').vcs(project, 
+
+            bespin.get('server').vcs(project,
                                     command,
                                     bespin.vcs.standardHandler);
         };
-        
+
         bespin.vcs.getRemoteauth(project, function(remoteauth) {
             console.log("remote auth is: " + remoteauth);
             if (remoteauth == "both") {
@@ -340,8 +368,8 @@ bespin.vcs.commands.addCommand({
                 sendRequest(undefined);
             }
         });
-        
-    }                                
+
+    }
 });
 
 bespin.vcs._performVCSCommandWithFiles = function(vcsCommand, self, args,
@@ -361,7 +389,7 @@ bespin.vcs._performVCSCommandWithFiles = function(vcsCommand, self, args,
         self.showInfo("You need to pass in a project");
         return;
     }
-    
+
     if (args.varargs.length == 0) {
         if (!path) {
             var dasha = "";
@@ -378,8 +406,8 @@ bespin.vcs._performVCSCommandWithFiles = function(vcsCommand, self, args,
         var command = [vcsCommand];
         command.concat(args.varargs);
     }
-    bespin.get('server').vcs(project, 
-                            {command: command}, 
+    bespin.get('server').vcs(project,
+                            {command: command},
                             bespin.vcs.standardHandler);
 }
 
@@ -417,15 +445,15 @@ bespin.vcs.commands.addCommand({
             self.showInfo("You need to pass in a project");
             return;
         }
-        bespin.get('server').vcs(project, 
-                                {command: ['commit', '-m', message]}, 
+        bespin.get('server').vcs(project,
+                                {command: ['commit', '-m', message]},
                                 bespin.vcs.standardHandler);
-    }                                
+    }
 });
 
 bespin.vcs._displaySSHKey = function(response) {
     bespin.util.webpieces.showContentOverlay(
-        '<h2>Your Bespin SSH public key</h2><input type="text" value="' 
+        '<h2>Your Bespin SSH public key</h2><input type="text" value="'
         + response + '" id="sshkey" style="width: 95%">'
     );
     dojo.byId("sshkey").select();
@@ -465,36 +493,78 @@ bespin.vcs.commands.addCommand({
 bespin.vcs.commands.addCommand({
     name: 'help',
     takes: ['search'],
-    preview: 'show commands',
-    description: 'The <u>help</u> gives you access to the various commands in the Bespin system.<br/><br/>You can narrow the search of a command by adding an optional search params.<br/><br/>Finally, pass in the full name of a command and you can get the full description, which you just did to see this!',
+    preview: 'show commands for vcs subcommand',
+    description: 'The <u>help</u> gives you access to the various commands in the vcs subcommand space.<br/><br/>You can narrow the search of a command by adding an optional search params.<br/><br/>Finally, pass in the full name of a command and you can get the full description, which you just did to see this!',
     completeText: 'optionally, narrow down the search',
     execute: function(self, extra) {
         bespin.cmd.displayHelp(bespin.vcs.commands, self, extra);
     }
-}); 
+});
+
+// Command store for the Mercurial commands
+// (which are subcommands of the main 'hg' command)
+bespin.vcs.hgCommands = new bespin.cmd.commandline.CommandStore({ subCommand: {
+    name: 'hg',
+    preview: 'run a Mercurial command',
+    subcommanddefault: 'help'
+}});
+
+// ** {{{Command: help}}} **
+bespin.vcs.hgCommands.addCommand({
+    name: 'help',
+    takes: ['search'],
+    preview: 'show commands for hg subcommand',
+    description: 'The <u>help</u> gives you access to the various commands in the hg subcommand space.<br/><br/>You can narrow the search of a command by adding an optional search params.<br/><br/>Finally, pass in the full name of a command and you can get the full description, which you just did to see this!',
+    completeText: 'optionally, narrow down the search',
+    execute: function(self, extra) {
+        bespin.cmd.displayHelp(bespin.vcs.hgCommands, self, extra);
+    }
+});
+
+// ** {{{Command: init}}} **
+bespin.vcs.hgCommands.addCommand({
+    name: 'init',
+    preview: 'initialize a new hg repository',
+    description: 'This will create a new repository in this project.',
+    execute: function(self) {
+        var project;
+
+        bespin.withComponent('editSession', function(editSession) {
+            project = editSession.project;
+        });
+
+        if (!project) {
+            self.showInfo("You need to pass in a project");
+            return;
+        }
+        bespin.get('server').vcs(project,
+                                {command: ['hg', 'init']},
+                                bespin.vcs.standardHandler);
+    }
+});
 
 
 // ** {{{ Event: bespin:vcs:response }}} **
 // Handle a response from a version control system command
 bespin.subscribe("vcs:response", function(event) {
     var output = event.output;
-    
+
     // if the output is all whitespace, we should display something
     // nicer
     if (/^\s*$/.exec(output)) {
         output = "(Successful command with no visible output)";
     }
-    
-    bespin.util.webpieces.showContentOverlay("<h2>vcs " 
-                    + event.command 
-                    + " output</h2><pre>" 
-                    + output 
+
+    bespin.util.webpieces.showContentOverlay("<h2>vcs "
+                    + event.command
+                    + " output</h2><pre>"
+                    + output
                     + "</pre>");
-                    
+
     if (event.command) {
         var command = event.command;
         if (command == "clone") {
-            bespin.publish("project:create", {project: event.project});
+            bespin.publish("project:create", { project: event.project });
         }
     }
 });
@@ -504,13 +574,3 @@ bespin.subscribe("vcs:response", function(event) {
 bespin.subscribe("vcs:error", function(event) {
     bespin.util.webpieces.showContentOverlay("<h2>Error in VCS command</h2><pre>" + event.output + "</pre>");
 });
-
-// ** {{{Command: vcs}}} **
-// This is the top level command that contains all of the other commands.
-bespin.cmd.commands.add({
-    name: 'vcs',
-    takes: ['*'],
-    preview: 'run a version control command',
-    subcommands: bespin.vcs.commands
-});
-

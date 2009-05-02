@@ -48,13 +48,13 @@ dojo.declare("bespin.client.settings.Core", null, {
         this.fromURL = new bespin.client.settings.URL();
         this.customEvents = new bespin.client.settings.Events(this);
 
-        this.loadStore(store);    // Load up the correct settings store
+        this.loadStore(store); // Load up the correct settings store
     },
 
     loadSession: function() {
         var path    = this.fromURL.get('path') || this.get('_path');
         var project = this.fromURL.get('project') || this.get('_project');
-        
+
         bespin.publish("settings:init", { // -- time to init my friends
             path: path,
             project: project
@@ -83,7 +83,7 @@ dojo.declare("bespin.client.settings.Core", null, {
     },
 
     isOff: function(value) {
-        return value == 'off' || value == 'false';
+        return value == 'off' || value == 'false' || value === undefined;
     },
     
     isSettingOn: function(key) {
@@ -293,26 +293,42 @@ dojo.declare("bespin.client.settings.ServerFile", null, {
     },
 
     _load: function() {
-        var checkLoaded = dojo.hitch(this, function() {
-            if (!this.loaded) { // first time load
-                this.loaded = true;
+        
+        var self = this;
+
+        var checkLoaded = function() {
+            if (!self.loaded) { // first time load
+                self.loaded = true;
                 bespin.publish("settings:loaded");
             }
-        });
+        };
 
-        setTimeout(dojo.hitch(this, function() {
-            bespin.get('files').loadContents(bespin.userSettingsProject, "settings", dojo.hitch(this, function(file) {
-                dojo.forEach(file.content.split(/\n/), dojo.hitch(this, function(setting) {
+        var loadSettings = function() {
+            bespin.get('files').loadContents(bespin.userSettingsProject, "settings", function(file) {
+                dojo.forEach(file.content.split(/\n/), function(setting) {
                     if (setting.match(/^\s*#/)) return; // if comments are added ignore
                     if (setting.match(/\S+\s+\S+/)) {
                         var pieces = setting.split(/\s+/);
-                        this.settings[dojo.trim(pieces[0])] = dojo.trim(pieces[1]);
+                        self.settings[dojo.trim(pieces[0])] = dojo.trim(pieces[1]);
                     }
-                }));
+                });
 
                 checkLoaded();
-            }), checkLoaded); // unable to load the file, so kick this off and a save should kick in
-        }), 0);
+            }, checkLoaded); // unable to load the file, so kick this off and a save should kick in
+        };
+
+        setTimeout(loadSettings, 0);
+
+        /*
+        if (bespin.authenticated) {
+            loadSettings();
+        }
+        else {
+            bespin.subscribe("authenticated", function() {
+                loadSettings();
+            });
+        }
+        */
     }
 });
 
@@ -659,7 +675,8 @@ dojo.declare("bespin.client.settings.Events", null, {
             if (newfile) { // scratch file
                 bespin.publish("editor:newfile", {
                    project: project,
-                   newfilename: path
+                   newfilename: path,
+                   content: settings.fromURL.get('content') || " "
                 });
             // existing file, so open it
             } else {
@@ -693,15 +710,6 @@ dojo.declare("bespin.client.settings.Events", null, {
             if (settings.isOff(settings.get('autoconfig'))) return;
 
             bespin.publish("editor:config:run");
-        });
-
-        // ** {{{ Event: settings:jslint }}} **
-        //
-        // When changing the jslint setting, restart the parser
-        bespin.subscribe("jslint", function(event) {
-            bespin.publish("parser:stop");
-            bespin.publish("parser:start");
-            bespin.get("parser").fetch();
         });
     }
 });

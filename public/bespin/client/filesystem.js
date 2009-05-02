@@ -21,15 +21,15 @@
  *   Bespin Team (bespin@mozilla.com)
  *
  * ***** END LICENSE BLOCK ***** */
- 
+
 // = FileSystem =
 //
 // This abstracts the remote Web Service file system, and in the future
 // local file systems too.
-// 
+//
 // It ties into the {{{bespin.client.Server}}} object for remote access
 
-dojo.provide("bespin.client.filesystem"); 
+dojo.provide("bespin.client.filesystem");
 
 dojo.declare("bespin.client.FileSystem", null, {
     constructor: function(server) {
@@ -91,10 +91,15 @@ dojo.declare("bespin.client.FileSystem", null, {
     // * {{{dontStartSession}}} is a flag to turn off starting a session. Used in the config loading for example
     collaborateOnFile: function(project, path, onSuccess) {
         var collab = bespin.get('settings').isSettingOn('collaborate');
+
+        if (collab && !bespin.mobwrite) {
+            console.log("Missing bespin.mobwrite: Forcing 'collaborate' to off in filesystem.js:collaborateOnFile");
+            collab = false;
+        }
+
         if (collab) {
             bespin.get('editSession').startSession(project, path, onSuccess);
-        }
-        else {
+        } else {
             this.loadContents(project, path, onSuccess);
         }
     },
@@ -214,7 +219,7 @@ dojo.declare("bespin.client.FileSystem", null, {
     //   elseFailed (file does not exist)
     whenFileExists: function(project, path, callbacks) {
         this.server.list(project, bespin.util.path.directory(path), function(files) {
-            if (files && dojo.some(files, function(file){ return (file.name == path); })) {   
+            if (files && dojo.some(files, function(file){ return (file.name == path); })) {
                 callbacks['execute']();
             } else {
                 if (callbacks['elseFailed']) callbacks['elseFailed']();

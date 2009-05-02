@@ -59,12 +59,24 @@ dojo.declare("bespin.client.session.EditSession", null, {
         this.project = project;
         this.path = path;
 
-        mobwrite.share(this);
+        if (typeof mobwrite !== "undefined") mobwrite.share(this); // was causing an error!
 
         if (dojo.isFunction(onSuccess)) onSuccess({
             name: path,
             timestamp: new Date().getTime()
         });
+    },
+
+    reportCollaborators: function(usernames) {
+        var contents = "";
+        dojo.forEach(usernames, function(username) {
+            contents += "<div class='collab_person'>";
+            contents += "  <div class='collab_icon'></div>";
+            contents += "  <div class='collab_name'>" + username + "</div>";
+            contents += "  <div class='collab_description'>Editing</div>";
+            contents += "</div>";
+        });
+        dojo.byId("collab_list").innerHTML = contents;
     },
 
     stopSession: function() {

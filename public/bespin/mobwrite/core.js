@@ -608,6 +608,9 @@ mobwrite.syncRun2_ = function(text) {
           }
         }
       }
+    } else if (name == 'C' || name == 'c') {
+      var users = value.split(",");
+      file._editSession.reportCollaborators(users);
     }
   }
 
@@ -687,6 +690,11 @@ mobwrite.syncLoadAjax_ = function(url, post, callback) {
     req.onreadystatechange = callback;
     req.open('POST', url, true);
     req.setRequestHeader('Content-Type','application/x-www-form-urlencoded');
+
+    // CSRF protection as defined by Bespin
+    var token = bespin.get("server").token;
+    req.setRequestHeader("Domain-Token", token);
+
     req.send(post);
   }
   return req;

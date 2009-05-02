@@ -21,7 +21,7 @@
  *   Bespin Team (bespin@mozilla.com)
  *
  * ***** END LICENSE BLOCK ***** */
- 
+
 dojo.provide("bespin.cmd.dashboardcommands");
 
 // = Dashboard Commands =
@@ -30,7 +30,7 @@ dojo.provide("bespin.cmd.dashboardcommands");
 
 bespin.cmd.dashboardcommands.Commands = [
     'help', 'files', 'set', 'project', 'projects', 'version', 'bespin',
-    'import', 'export', 'alias', 'history', 'mkdir', 'newfile', 'rm',
-    'createproject', 'deleteproject', 'renameproject', 'status',
-    'vcs', 'clone', 'commit', 'diff', 'getkey', 'add', 'push', 'update'
+    'hg', 'import', 'export', 'alias', 'history', 'mkdir', 'newfile', 'rm',
+    'createproject', 'deleteproject', 'renameproject', 'status', 'jetpack',
+    'vcs'
 ];

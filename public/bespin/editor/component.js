@@ -1,5 +1,7 @@
 dojo.provide("bespin.editor.component");
 
+dojo.require("dojo.cookie");
+
 dojo.require("bespin.bespin");
 
 dojo.require("bespin.util.canvas");
@@ -30,6 +32,10 @@ dojo.require("bespin.themes.default");
 
 dojo.require("bespin.syntax.base"); 
 dojo.require("bespin.syntax.simple._base");
+dojo.require("bespin.syntax.simple.javascript");
+dojo.require("bespin.syntax.simple.css");
+dojo.require("bespin.syntax.simple.html");
+dojo.require("bespin.syntax.simple.php");
 
 dojo.require("bespin.cmd.commandline");
 dojo.require("bespin.cmd.commands");
