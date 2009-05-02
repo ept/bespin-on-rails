@@ -6,16 +6,9 @@ Bespin code editor component in your Rails views using simple helper tags.
 Bespin is a Mozilla Labs experiment on how to build an extensible Web code
 editor using HTML 5 technology.
 
-Bespin Project home page: http://labs.mozilla.com/projects/bespin
-Bespin Live system: https://bespin.mozilla.com
+To learn more about Mozilla Bespin check out their home page: http://labs.mozilla.com/projects/bespin and their Wiki: https://wiki.mozilla.org/Labs/Bespin
 
-This plugin comes bundled with Bespin (source code version 2009/04/23). To learn more
-about Bespin have a look at their Labs site at http://labs.mozilla.com/projects/bespin. 
-Please report any issue with the editor on their issue tracker.
-
-We will upgrade the plugin to Bespin 0.2 as soon as possible.
-
-There is also an unofficial Bespin mirror on GitHub at http://github.com/bespin/bespin.
+This plugin comes bundled with Bespin 0.2.1 "Cheeky Cirrus".
 
 To report issues related to the plugin please use the issue tracker on
 GitHub at http://github.com/provideal/bespin-on-rails/issues.
@@ -25,17 +18,16 @@ If you have any comments on the plugin please contact me (René) by email
 
 == Requirements
 
-You need at least Rails 2.3 for this plugin. To make the bundled resources
-available in your applications public folder the plugin will create a symlink
-from your applications public folder to the plugins public folder. This is
-currently done using the 'ln' unix command. As a result the plugin won't
-work on Windows.
+You need at least Rails 2.3 for this plugin. 
 
-To work around this you can manually copy all files from vendor/plugins/bespin-on-rails/public
-to public/_plugins/bespin-on-rails.
+To make the bundled resources available in your applications public folder 
+the plugin will create a symlink from your applications public folder to the 
+plugins public folder. This is done using the 'ln' unix command. As a result 
+the plugin won't work on Windows. To work around this you can manually copy all 
+files from vendor/plugins/bespin-on-rails/public to public/_plugins/bespin-on-rails.
 
-You need a browser that is able to work with Mozilla Bespin. Safari 4 (beta) and 
-Mozilla Firefox 3.0.9 are fine.
+You need a browser that is able to work with Mozilla Bespin. Check out
+their Wiki if your browser is supported: https://wiki.mozilla.org/Labs/Bespin/UserGuide#Requisites
 
 == Installation
 
@@ -96,8 +88,7 @@ Example:
     ...
   <% end %>
 
-This will set the syntax highlighter for JavaScript. Available highlighters are 'arduino', 'css', 'html', 
-'javascript', 'php'.
+This will set the syntax highlighter for JavaScript. Available highlighters are 'css', 'html', 'js', 'php'.
 
 * <tt>:settings</tt> - A hash of Bespin settings.
 
@@ -105,10 +96,12 @@ Example:
 
   <% form_for @code_snippet do |f| %>
     ...
-    <%= bespin_editor_tag 'code_snippet[snippet]', '<div>some html snippet</div>', :settings => {strictlines => 'on'} %>
+    <%= bespin_editor_tag 'code_snippet[snippet]', '<div>some html snippet</div>', :settings => {:highlightline => 'on'} %>
     ...
   <% end %>
 
-Please note: Setting a theme (e.g :theme => 'white') is currently broken.
+This will highlight the line where the cursor is. Check out https://wiki.mozilla.org/Labs/Bespin/UserGuide#Settings for more options (may be out of date).
+
+Please note: Setting a theme (e.g :theme => 'white') is currently broken in this plugin.
 
 Copyright (c) 2009 Provideal Systems GmbH, released under the MIT license
