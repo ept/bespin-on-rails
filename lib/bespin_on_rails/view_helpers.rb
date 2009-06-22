@@ -2,10 +2,9 @@ module BespinOnRails
   module Helpers
     module FormTagHelper
       def bespin_include_tag
-        code  = ''
-        code << javascript_tag('var djConfig = { parseOnLoad: false, isDebug: false, debugAtAllCosts: false };')
-        code << javascript_include_tag('/_plugins/bespin-on-rails/dojo/dojo.js')
-        code << javascript_include_tag('/_plugins/bespin-on-rails/bespin/editor/embed.js')
+        javascript_tag('var djConfig = { parseOnLoad: false, isDebug: false, debugAtAllCosts: false };') +
+        javascript_include_tag('/javascripts/dojo-1.3.1.js') +
+        javascript_include_tag('/javascripts/bespin-2.3.js')
       end
       
       def bespin_editor_tag(name, content = nil, options = {})

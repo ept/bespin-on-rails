@@ -1,20 +1,28 @@
-<%= text_area_tag name, content, :style => 'display:none'%>
+<% id = name.gsub('[', '_').gsub(']','') %>
+<div id = "<%= id %>_hidden">
+  <%= text_area_tag name, content, :id => id, :rows => 25, :cols => 90 %>
+</div>
 
-<div id="<%= name -%>_editor" style="<%= editor_style -%>"></div>
+<div id="<%= id -%>_editor" style="<%= editor_style -%>"></div>
 <script type="text/javascript">
   dojo.addOnLoad(function() {
-    _editorComponent = new bespin.editor.Component("<%= name -%>_editor", {
-      language: "<%= language -%>"
-    });
+    try
+    {
+      _editorComponent = new bespin.editor.Component("<%= id -%>_editor", {
+        language: "<%= language -%>"
+      });
 
-    <% settings.each do |k, v| %>
-    _editorComponent.set("<%= k -%>", "<%= v -%>");
-    <% end %>
+      <% settings.each do |k, v| %>
+      _editorComponent.set("<%= k -%>", "<%= v -%>");
+      <% end %>
 
-    _editorComponent.setContent(dojo.byId("<%= name -%>").value);
+      _editorComponent.setContent(dojo.byId("<%= id -%>").value);
 
-    _editorComponent.onchange(function() {
-      dojo.byId("<%= name -%>").value = _editorComponent.getContent();
-    });
+      _editorComponent.onchange(function() {
+        dojo.byId("<%= id -%>").value = _editorComponent.getContent();
+      });
+      dojo.byId("<%= id %>_hidden").style.display = "none";
+    }
+    catch(e){ } 
   });
 </script>
