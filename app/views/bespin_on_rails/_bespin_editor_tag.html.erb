@@ -1,6 +1,6 @@
 <% id = name.gsub('[', '_').gsub(']','') %>
 <div id = "<%= id %>_hidden">
-  <%= text_area_tag name, content, :id => id, :rows => 25, :cols => 90 %>
+  <%= text_area_tag name, h(content), :id => id, :rows => 25, :cols => 90 %>
 </div>
 
 <div id="<%= id -%>_editor" style="<%= editor_style -%>"></div>
