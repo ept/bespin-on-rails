@@ -1,28 +1,85 @@
 <% id = name.gsub('[', '_').gsub(']','') %>
-<div id = "<%= id %>_hidden">
-  <%= text_area_tag name, h(content), :id => id, :rows => 25, :cols => 90 %>
+<span id="<%= id %>_toggles" class="editor-toggle" style="display: none"><a href="#toggle"></a></span>
+<div id="<%= id %>_hidden">
+  <%= text_area_tag name, h(content), :id => id, :style => "width: 100%;font-size: 130%;" + editor_style %>
 </div>
-
-<div id="<%= id -%>_editor" style="<%= editor_style -%>"></div>
+<div id="<%= id -%>_editor" style="<%= editor_style -%>;display: none"></div>
 <script type="text/javascript">
-  dojo.addOnLoad(function() {
-    try
-    {
-      _editorComponent = new bespin.editor.Component("<%= id -%>_editor", {
-        language: "<%= language -%>"
-      });
+    dojo.addOnLoad(function() {
 
-      <% settings.each do |k, v| %>
-      _editorComponent.set("<%= k -%>", "<%= v -%>");
-      <% end %>
+        var when_on = "Turn off Bespin";
+        var when_off = "Use Bespin editor";
 
-      _editorComponent.setContent(dojo.byId("<%= id -%>").value);
+        function setCookie(cookieName, cookieValue) {
+            var today = new Date();
+            var expire = new Date();
+            var nDays = 30;
+            expire.setTime( today.getTime() + (3600000 * 24 * nDays) );
+            document.cookie = cookieName + "=" + escape(cookieValue)
+                            + ";expires="+expire.toGMTString();
+        }
+        function getCookie(cookieName) {
+             var start = document.cookie.indexOf( cookieName + "=" );
+             if ( start == -1 ) return "";
+             var len = start + cookieName.length + 1;
+             if ( ( !start ) &&
+               ( cookieName != document.cookie.substring( 0, cookieName.length ) ) )
+                 {
+                   return "";
+                 }
+             var end = document.cookie.indexOf( ";", len );
+             if ( end == -1 ) end = document.cookie.length;
+             return unescape( document.cookie.substring( len, end ) );
+        }
 
-      _editorComponent.onchange(function() {
-        dojo.byId("<%= id -%>").value = _editorComponent.getContent();
-      });
-      dojo.byId("<%= id %>_hidden").style.display = "none";
-    }
-    catch(e){ } 
-  });
+        function show_bespin () {
+            $("#<%= id %>_editor").show();
+            $("#<%= id %>_hidden").hide();
+            $("#<%= id %>_toggles a").html(when_on)
+            _editorComponent.setContent(dojo.byId("<%= id -%>").value);
+            setCookie('use_bespin', 'yes');
+        }
+
+        function hide_bespin () {
+            $("#<%= id %>_hidden").show();
+            $("#<%= id %>_editor").hide();
+            $("#<%= id %>_toggles a").html(when_off)
+            setCookie('use_bespin', 'no');
+        }
+ 
+
+
+        if (dojo.isFF >= 3 || dojo.isMoz >= 5 || dojo.isChrome >= 3 || dojo.isSafari >= 4) {
+
+            try {
+                _editorComponent = new bespin.editor.Component("<%= id -%>_editor", {
+                  language: "<%= language -%>"
+                });
+  
+                <% settings.each do |k, v| %>
+                _editorComponent.set("<%= k -%>", "<%= v -%>");
+                <% end %>
+  
+                _editorComponent.onchange(function() {
+                  dojo.byId("<%= id -%>").value = _editorComponent.getContent();
+                });
+
+                $("#<%= id %>_toggles a").click(function () {
+                    if (this.textContent == when_on)
+                        hide_bespin();
+                    else
+                        show_bespin();
+                });
+                $('#<%= id %>_toggles').show()
+                if (getCookie('use_bespin') != 'no')
+                    show_bespin();
+                else
+                    hide_bespin();
+            } catch (e) {
+                if (typeof console != 'undefined')
+                    console.log(e);
+                hide_bespin();
+            }
+        }
+    });
 </script>
