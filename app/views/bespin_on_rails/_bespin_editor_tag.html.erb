@@ -16,6 +16,7 @@
             var nDays = 30;
             expire.setTime( today.getTime() + (3600000 * 24 * nDays) );
             document.cookie = cookieName + "=" + escape(cookieValue)
+                            + ";path=/"
                             + ";expires="+expire.toGMTString();
         }
         function getCookie(cookieName) {
