@@ -1,5 +1,17 @@
 <% id = name.gsub('[', '_').gsub(']','') %>
-<span id="<%= id %>_toggles" class="editor-toggle" style="display: none"><a href="#toggle"></a></span>
+<p class="buttons">
+<% if @is_gotest_it %>
+  <a href="#" style="display: none" id="reopen-script-recorder-button">
+    <img src="/icons/camera_edit.png" alt="" />  Open <%= h @test_script.name %> in script recorder
+  </a>
+<% end %>
+  <span id="<%= id %>_toggles" class="editor-toggle" style="display: none">
+    <a href="#toggle">
+      <img src="/icons/page_white_edit.png" alt=""> <span id="<%= id %>_toggle"></span>
+    </a>
+  </span>
+</p>
+<% if @is_gotest_it %><p class="warning"><b>Warning</b>: editing selenium test scripts by hand is intended for advanced users only.</p><% end %>
 <div id="<%= id %>_hidden">
   <%= text_area_tag name, h(content), :id => id, :style => "width: 100%;font-size: 130%;" + editor_style %>
 </div>
@@ -7,36 +19,13 @@
 <script type="text/javascript">
     dojo.addOnLoad(function() {
 
-        var when_on = "Turn off Bespin";
+        var when_on = "Use plain editor";
         var when_off = "Use Bespin editor";
-
-        function setCookie(cookieName, cookieValue) {
-            var today = new Date();
-            var expire = new Date();
-            var nDays = 30;
-            expire.setTime( today.getTime() + (3600000 * 24 * nDays) );
-            document.cookie = cookieName + "=" + escape(cookieValue)
-                            + ";path=/"
-                            + ";expires="+expire.toGMTString();
-        }
-        function getCookie(cookieName) {
-             var start = document.cookie.indexOf( cookieName + "=" );
-             if ( start == -1 ) return "";
-             var len = start + cookieName.length + 1;
-             if ( ( !start ) &&
-               ( cookieName != document.cookie.substring( 0, cookieName.length ) ) )
-                 {
-                   return "";
-                 }
-             var end = document.cookie.indexOf( ";", len );
-             if ( end == -1 ) end = document.cookie.length;
-             return unescape( document.cookie.substring( len, end ) );
-        }
 
         function show_bespin () {
             $("#<%= id %>_editor").show();
             $("#<%= id %>_hidden").hide();
-            $("#<%= id %>_toggles a").html(when_on)
+            $("#<%= id %>_toggle").html(when_on)
             _editorComponent.setContent(dojo.byId("<%= id -%>").value);
             setCookie('use_bespin', 'yes');
         }
@@ -44,7 +33,7 @@
         function hide_bespin () {
             $("#<%= id %>_hidden").show();
             $("#<%= id %>_editor").hide();
-            $("#<%= id %>_toggles a").html(when_off)
+            $("#<%= id %>_toggle").html(when_off)
             setCookie('use_bespin', 'no');
         }
  
@@ -66,7 +55,7 @@
                 });
 
                 $("#<%= id %>_toggles a").click(function () {
-                    if (this.textContent == when_on)
+                    if ($("#<%= id %>_toggle").html() == when_on)
                         hide_bespin();
                     else
                         show_bespin();
